@@ -1,108 +1,66 @@
+// Import required modules
 const express = require('express');
+const path = require('path');
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Initialize the app
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
-// Database Configuration
+// Database configuration
 const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  ssl: { rejectUnauthorized: false } // Required for Render PostgreSQL
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT,
+    ssl: { rejectUnauthorized: false } // Required for Render-hosted PostgreSQL
 };
 
+// Create a connection pool
 const pool = new Pool(dbConfig);
 
-// GET All Items
-app.get('/items', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM items');
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error fetching items:', err.message);
-    res.status(500).send('Server Error');
-  }
+// Middleware to parse JSON and serve static files
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'routes/frontend')));
+
+// Root route: Serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'routes/frontend', 'index.html'));
 });
 
-// Start the Server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-// GET a Single Item by ID
-app.get('/items/:id', async (req, res) => {
-    const { id } = req.params;
+// API route: Fetch all items from the database
+app.get('/items', async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM items WHERE id = $1', [id]);
-      if (result.rows.length === 0) {
-        return res.status(404).send('Item not found');
-      }
-      res.json(result.rows[0]);
-    } catch (err) {
-      console.error('Error fetching item:', err.message);
-      res.status(500).send('Server Error');
+        const result = await pool.query('SELECT * FROM items');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching items:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
-  // POST - Add a New Item
+});
+
+// API route: Add a new item to the database
 app.post('/items', async (req, res) => {
     const { name, description } = req.body;
+
     if (!name || !description) {
-      return res.status(400).send('Name and description are required');
+        return res.status(400).json({ error: 'Name and description are required' });
     }
-  
+
     try {
-      const result = await pool.query(
-        'INSERT INTO items (name, description) VALUES ($1, $2) RETURNING *',
-        [name, description]
-      );
-      res.status(201).json(result.rows[0]);
-    } catch (err) {
-      console.error('Error adding item:', err.message);
-      res.status(500).send('Server Error');
+        const query = 'INSERT INTO items (name, description) VALUES ($1, $2) RETURNING *';
+        const values = [name, description];
+        const result = await pool.query(query, values);
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error inserting item:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
-// PUT - Update an Item by ID
-app.put('/items/:id', async (req, res) => {
-    const { id } = req.params;
-    const { name, description } = req.body;
-  
-    try {
-      const result = await pool.query(
-        'UPDATE items SET name = $1, description = $2 WHERE id = $3 RETURNING *',
-        [name, description, id]
-      );
-  
-      if (result.rows.length === 0) {
-        return res.status(404).send('Item not found');
-      }
-  
-      res.json(result.rows[0]);
-    } catch (err) {
-      console.error('Error updating item:', err.message);
-      res.status(500).send('Server Error');
-    }
-  });
-  // DELETE - Remove an Item by ID
-app.delete('/items/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const result = await pool.query('DELETE FROM items WHERE id = $1 RETURNING *', [id]);
-  
-      if (result.rows.length === 0) {
-        return res.status(404).send('Item not found');
-      }
-  
-      res.send('Item deleted successfully');
-    } catch (err) {
-      console.error('Error deleting item:', err.message);
-      res.status(500).send('Server Error');
-    }
-  });
-  
-  
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
