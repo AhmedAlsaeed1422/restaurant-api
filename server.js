@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000; // Use Heroku's port or default to 3000
