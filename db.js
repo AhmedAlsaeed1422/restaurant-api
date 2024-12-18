@@ -1,18 +1,14 @@
-const mysql = require("mysql2");
+const { Client } = require('pg');
 
-const db = mysql.createConnection({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASS || "",
-  database: process.env.DB_NAME || "restaurant_db",
+const client = new Client({
+    host: 'dpg-cth61nogph6c73d8mrig-a', // New host
+    user: 'restaurant_api_85so_user',   // Your database username
+    password: 'hkmcgqXr2UzMDaJ2iZKo85pj13Yx8C7s', // Your database password
+    database: 'restaurant_api_85so',   // Database name
+    port: 5432,                        // Default PostgreSQL port
+    ssl: { rejectUnauthorized: false } // SSL must be enabled for cloud databases
 });
 
-db.connect((err) => {
-  if (err) {
-    console.error("Database connection failed:", err.message);
-  } else {
-    console.log("MySQL Connected...");
-  }
-});
-
-module.exports = db;
+client.connect()
+    .then(() => console.log("Database connected successfully!"))
+    .catch(err => console.error("Database connection failed:", err));
