@@ -1,17 +1,30 @@
 require('dotenv').config();
-
 const express = require('express');
+const mysql = require('mysql2');
+
 const app = express();
-const PORT = process.env.PORT || 3000; // Use Heroku's port or default to 3000
+const port = process.env.PORT || 3000;
 
-app.use(express.json());
-
-// Sample route to test the app
-app.get('/', (req, res) => {
-    res.send('Restaurant API is running!');
+// Database connection
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+db.connect((err) => {
+    if (err) {
+        console.error('Database connection failed:', err.message);
+        process.exit(1); // Exit if the database fails
+    }
+    console.log('Connected to database');
+});
+
+app.get('/', (req, res) => {
+    res.send('Hello! Your app is running correctly.');
+});
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
