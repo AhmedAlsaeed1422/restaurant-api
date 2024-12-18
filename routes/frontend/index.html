@@ -1,30 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Menu</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant API</title>
 </head>
 <body>
-    <h1>Restaurant Menu</h1>
+  <h1>Restaurant API</h1>
 
-    <!-- Button to Fetch Dishes -->
-    <button onclick="fetchDishes()">Load Dishes</button>
+  <!-- Fetch Items Section -->
+  <button id="fetch-items-btn">Fetch All Items</button>
+  <ul id="items-list"></ul>
 
-    <!-- Container for Displaying Dishes -->
-    <div id="menu"></div>
+  <!-- Add Item Section -->
+  <h2>Add New Item</h2>
+  <input type="text" id="item-name" placeholder="Item Name" required>
+  <input type="text" id="item-description" placeholder="Item Description" required>
+  <button id="add-item-btn">Add Item</button>
 
-    <!-- Form to Add a New Dish -->
-    <h2>Add a New Dish</h2>
-    <form id="addDishForm">
-        <input type="text" id="name" placeholder="Name" required>
-        <input type="number" id="price" placeholder="Price" required>
-        <input type="text" id="category" placeholder="Category" required>
-        <input type="text" id="description" placeholder="Description" required>
-        <button type="submit">Add Dish</button>
-    </form>
-
-    <script src="script.js"></script>
+  <!-- Link to script.js -->
+  <script src="script.js"></script>
 </body>
 </html>
