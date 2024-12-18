@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant API</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant API</title>
 </head>
 <body>
-  <h1>Restaurant API</h1>
+    <h1>Restaurant API</h1>
+    <button id="fetch-items">Fetch All Items</button>
+    <div id="items-container"></div>
 
-  <!-- Fetch Items Section -->
-  <button id="fetch-items-btn">Fetch All Items</button>
-  <ul id="items-list"></ul>
+    <h2>Add New Item</h2>
+    <input type="text" id="item-name" placeholder="Item Name">
+    <input type="text" id="item-description" placeholder="Item Description">
+    <button id="add-item">Add Item</button>
 
-  <!-- Add Item Section -->
-  <h2>Add New Item</h2>
-  <input type="text" id="item-name" placeholder="Item Name" required>
-  <input type="text" id="item-description" placeholder="Item Description" required>
-  <button id="add-item-btn">Add Item</button>
-
-  <!-- Link to script.js -->
-  <script src="script.js"></script>
+    <!-- Include the script.js file -->
+    <script src="script.js"></script>
 </body>
 </html>
