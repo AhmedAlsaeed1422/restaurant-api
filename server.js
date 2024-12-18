@@ -1,60 +1,56 @@
 const express = require('express');
 const mysql = require('mysql2');
-require('dotenv').config(); // For using environment variables
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Use Heroku's $PORT or fallback to 3000 for local testing
+const PORT = process.env.PORT || 3000;
 
-// Middleware
+// Middleware to parse JSON data
 app.use(express.json());
 
-// Database Connection
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,      // Hostname from Heroku Config Vars
-    user: process.env.DB_USER,      // Database username
-    password: process.env.DB_PASS,  // Database password
-    database: process.env.DB_NAME,  // Database name
+// Database connection
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST || 'localhost',      // Database host
+  user: process.env.DB_USER || 'root',           // Database user
+  password: process.env.DB_PASS || '',           // Database password
+  database: process.env.DB_NAME || 'restaurant_db', // Database name
+  port: 3306                                     // MySQL port
 });
 
-db.connect((err) => {
-    if (err) {
-        console.error('Database connection failed:', err.message);
-        process.exit(1); // Exit if database connection fails
-    }
-    console.log('Connected to the MySQL database.');
+// Connect to database
+connection.connect((err) => {
+  if (err) {
+    console.error('Database connection failed:', err.message);
+    return;
+  }
+  console.log('Connected to the database successfully!');
 });
 
-// Default Route
-app.get('/', (req, res) => {
-    res.send('Welcome to the Restaurant API!');
-});
-
-// Fetch All Dishes
+// Route to fetch dishes
 app.get('/dishes', (req, res) => {
-    const query = 'SELECT * FROM dishes';
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error fetching dishes:', err.message);
-            return res.status(500).json({ error: 'Failed to fetch dishes.' });
-        }
-        res.json(results);
-    });
+  connection.query('SELECT * FROM dishes', (err, results) => {
+    if (err) {
+      res.status(500).send({ error: 'Failed to fetch dishes' });
+    } else {
+      res.status(200).json(results);
+    }
+  });
 });
 
-// Add a New Dish
+// Route to add a new dish
 app.post('/dishes', (req, res) => {
-    const { name, price, category, description } = req.body;
-    const query = 'INSERT INTO dishes (name, price, category, description) VALUES (?, ?, ?, ?)';
-    db.query(query, [name, price, category, description], (err) => {
-        if (err) {
-            console.error('Error adding dish:', err.message);
-            return res.status(500).json({ error: 'Failed to add the dish.' });
-        }
-        res.status(201).json({ message: 'Dish added successfully!' });
-    });
+  const { name, price, category, description } = req.body;
+  const query = 'INSERT INTO dishes (name, price, category, description) VALUES (?, ?, ?, ?)';
+  connection.query(query, [name, price, category, description], (err, result) => {
+    if (err) {
+      res.status(500).send({ error: 'Failed to add dish' });
+    } else {
+      res.status(201).send({ message: 'Dish added successfully!', dishId: result.insertId });
+    }
+  });
 });
 
-// Start the Server
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
