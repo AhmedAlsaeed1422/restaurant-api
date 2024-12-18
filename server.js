@@ -1,25 +1,25 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const db = require('./db'); // Import the database connection
-const dishesRoutes = require('./routes/dishes'); // Import dishes routes
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const db = require("./db"); // Database connection
+const dishesRoutes = require("./routes/dishes");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(bodyParser.json()); // Parse JSON data from requests
-app.use(cors()); // Allow cross-origin requests
+app.use(bodyParser.json());
+app.use(cors());
 
 // Routes
-app.use('/dishes', dishesRoutes); // All dish-related routes
+app.use("/dishes", dishesRoutes);
 
-// Test route
-app.get('/', (req, res) => {
-    res.send('API is running...');
+// Root route
+app.get("/", (req, res) => {
+  res.send("API is running...");
 });
 
 // Start the server
-const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
